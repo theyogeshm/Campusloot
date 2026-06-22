@@ -26,7 +26,7 @@ services:
     env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    publishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
         sync: false # Set manually in Render Dashboard (e.g., https://your-backend.onrender.com/api)
