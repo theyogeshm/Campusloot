@@ -1,0 +1,6 @@
+{
+  "name": "CampusLoot",
+  "description": "The elite standard student network with hyper-exclusive internship opportunities, hackathons, activities, and scholarships.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

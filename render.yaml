@@ -1,0 +1,35 @@
+services:
+  # Express Backend Web Service
+  - type: web
+    name: campusloot-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false # Set your MongoDB Atlas connection string in the Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true # Generates a random secret key automatically
+      - key: SUPER_ADMIN_EMAIL
+        value: admin@example.com
+
+  # React Frontend Static Site
+  - type: web
+    name: campusloot-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          name: campusloot-backend
+          type: web
+          property: url
+          # Render automatically appends the backend URL here.
+          # Note: Vite injects environment variables during build time.

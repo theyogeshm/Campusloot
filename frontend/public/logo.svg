@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background glow filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Primary Golden Gradient -->
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD000" />
+      <stop offset="50%" stop-color="#F5A623" />
+      <stop offset="100%" stop-color="#D4881A" />
+    </linearGradient>
+    
+    <!-- Secondary Dark/Glassy Gradient for Shield fill -->
+    <linearGradient id="shield-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E1E1E" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0B0B0B" stop-opacity="0.95" />
+    </linearGradient>
+
+    <!-- Accent Border Gradient -->
+    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD000" stop-opacity="0.8" />
+      <stop offset="30%" stop-color="#F5A623" stop-opacity="0.3" />
+      <stop offset="70%" stop-color="#D4881A" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#FFD000" stop-opacity="0.6" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Shield Outline with subtle golden border gradient -->
+  <path 
+    d="M256 30 L436 120 V330 C436 410 356 465 256 490 C156 465 76 410 76 330 V120 Z" 
+    fill="url(#shield-grad)" 
+    stroke="url(#border-grad)" 
+    stroke-width="10" 
+    stroke-linejoin="round"
+  />
+
+  <!-- Academic Graduation Cap Emblem (Merged with Campus concept) -->
+  <path 
+    d="M256 95 L376 135 L256 175 L136 135 Z" 
+    fill="url(#gold-grad)" 
+    opacity="0.25"
+  />
+  <path 
+    d="M196 155 V185 C196 195 220 205 256 205 C292 205 316 195 316 185 V155" 
+    stroke="url(#gold-grad)" 
+    stroke-width="4" 
+    fill="none"
+    opacity="0.25"
+  />
+  <!-- Tassel -->
+  <path 
+    d="M376 135 V195 C376 205 366 210 366 210" 
+    stroke="url(#gold-grad)" 
+    stroke-width="3" 
+    fill="none"
+    opacity="0.25"
+  />
+
+  <!-- Glowing Core Golden Lightning Bolt -->
+  <path 
+    d="M290 150 H190 L170 280 H250 L220 420 L340 250 H260 Z" 
+    fill="url(#gold-grad)" 
+    filter="url(#glow)"
+  />
+  
+  <!-- Overlay inner sharp lightning bolt for crisp definition -->
+  <path 
+    d="M290 150 H190 L170 280 H250 L220 420 L340 250 H260 Z" 
+    fill="url(#gold-grad)" 
+  />
+</svg>

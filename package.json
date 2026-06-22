@@ -1,0 +1,16 @@
+{
+  "name": "campusloot-root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --prefix-colors \"cyan,magenta\" --names \"BACKEND,FRONTEND\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
+    "clean": "npm --prefix frontend run clean"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.3"
+  }
+}
