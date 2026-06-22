@@ -680,6 +680,7 @@ export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminName, setAdminName] = useState('');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
 
   // Admin Register State
   const [registerName, setRegisterName] = useState('');
@@ -3362,40 +3363,59 @@ export default function App() {
 
           {/* Auth state buttons — Console Login is intentionally NOT here */}
           {isAdminLoggedIn ? (
-            // Admin logged in: show admin name + disconnect/dashboard
-            <div className="flex items-center gap-4">
-              <div className="text-left">
-                <p className="text-xs font-bold text-white leading-tight font-sans">{adminName}</p>
-                <span
-                  style={{ color: isSuperAdmin ? '#FF4B4B' : '#F5A623', fontSize: '11px', letterSpacing: '0.08em', fontFamily: "'Space Grotesk', sans-serif" }}
-                  className="font-bold uppercase block mt-0.5 leading-none"
-                >
-                  {isSuperAdmin ? 'SUPER ADMIN' : 'ADMIN'}
-                </span>
-              </div>
-              {isSuperAdmin && (
-                <button
-                  onClick={() => navigateTo('/superadmin')}
-                  style={{ border: '1px solid #FF4B4B', background: 'rgba(255, 75, 75, 0.1)' }}
-                  className="text-[#FF4B4B] px-3.5 py-1.5 rounded-[8px] text-xs font-semibold hover:bg-[#FF4B4B] hover:text-[#0B0B0B] transition-all cursor-pointer"
-                >
-                  Super Admin Panel
-                </button>
+            // Admin logged in: show admin name + disconnect/dashboard via responsive dropdown
+            <div className="relative">
+              <button
+                onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
+                className="flex items-center gap-2 bg-[#111111] hover:bg-[#1A1A1A] border border-[#1E1E1E] hover:border-[#F5A623]/50 px-3 py-1.5 rounded-full transition-all cursor-pointer text-white"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#F5A623]/20 flex items-center justify-center border border-[#F5A623]/40">
+                  <span className="text-xs font-bold text-[#F5A623]">{adminName.charAt(0).toUpperCase()}</span>
+                </div>
+                <span className="text-xs font-semibold hidden sm:inline">{adminName}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#ccc3d8]" />
+              </button>
+
+              {adminDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-[#111111]/95 backdrop-blur-xl border border-[#1E1E1E] rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] z-50 animate-fade-in space-y-2">
+                  <div className="px-2 py-1.5 border-b border-[#1E1E1E]/60 text-left">
+                    <p className="text-xs font-bold text-white font-sans truncate">{adminName}</p>
+                    <span
+                      style={{ color: isSuperAdmin ? '#FF4B4B' : '#F5A623', fontSize: '10px', letterSpacing: '0.08em', fontFamily: "'Space Grotesk', sans-serif" }}
+                      className="font-bold uppercase block mt-0.5 leading-none"
+                    >
+                      {isSuperAdmin ? 'SUPER ADMIN' : 'ADMIN'}
+                    </span>
+                  </div>
+                  <div className="space-y-1 pt-1">
+                    {isSuperAdmin && (
+                      <button
+                        onClick={() => { navigateTo('/superadmin'); setAdminDropdownOpen(false); }}
+                        style={{ background: 'rgba(255, 75, 75, 0.08)' }}
+                        className="w-full text-left text-[#FF4B4B] hover:bg-[#FF4B4B] hover:text-[#0B0B0B] px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
+                      >
+                        <Shield className="w-3.5 h-3.5" />
+                        Super Admin Panel
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { navigateTo('/admin/dashboard'); setAdminDropdownOpen(false); }}
+                      style={{ background: 'rgba(245, 166, 35, 0.08)' }}
+                      className="w-full text-left text-[#F5A623] hover:bg-[#F5A623] hover:text-[#0B0B0B] px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
+                    >
+                      <Terminal className="w-3.5 h-3.5" />
+                      Admin Panel
+                    </button>
+                    <button
+                      onClick={() => { handleDisconnect(); setAdminDropdownOpen(false); }}
+                      className="w-full text-left text-rose-400 hover:bg-rose-500 hover:text-white px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      Log Out
+                    </button>
+                  </div>
+                </div>
               )}
-              <button
-                onClick={() => navigateTo('/admin/dashboard')}
-                style={{ border: '1px solid #F5A623', background: 'rgba(245, 166, 35, 0.1)' }}
-                className="text-[#F5A623] px-3.5 py-1.5 rounded-[8px] text-xs font-semibold hover:bg-[#F5A623] hover:text-[#0B0B0B] transition-all cursor-pointer"
-              >
-                Admin Panel
-              </button>
-              <button
-                onClick={handleDisconnect}
-                style={{ border: '1px solid #2A2A2A', background: 'transparent' }}
-                className="text-white px-3 py-1.5 rounded-[8px] text-xs font-semibold hover:border-[#F5A623] hover:text-[#F5A623] transition-colors cursor-pointer"
-              >
-                Log Out
-              </button>
             </div>
           ) : isStudentLoggedIn ? (
             // Logged-in student: show name + logout
