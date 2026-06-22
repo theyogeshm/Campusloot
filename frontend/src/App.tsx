@@ -49,6 +49,8 @@ import {
 } from './data';
 import { Internship, Hackathon, Activity, Scholarship } from './types';
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL ?? '/api';
+
 export default function App() {
   // Navigation State
   // "Internships" | "Hackathons" | "Scholarships" | "Activities" | "Discover"
@@ -113,10 +115,10 @@ export default function App() {
     if (!token) return;
     try {
       const [resUsers, resAdmins] = await Promise.all([
-        fetch('/api/superadmin/users', {
+        fetch(`${API_BASE}/superadmin/users`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('/api/superadmin/admins', {
+        fetch(`${API_BASE}/superadmin/admins`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -139,10 +141,10 @@ export default function App() {
           setSaLoadingUsers(true);
           setSaLoadingAdmins(true);
           const [resUsers, resAdmins] = await Promise.all([
-            fetch('/api/superadmin/users', {
+            fetch(`${API_BASE}/superadmin/users`, {
               headers: { 'Authorization': `Bearer ${token}` }
             }),
-            fetch('/api/superadmin/admins', {
+            fetch(`${API_BASE}/superadmin/admins`, {
               headers: { 'Authorization': `Bearer ${token}` }
             })
           ]);
@@ -170,7 +172,7 @@ export default function App() {
     try {
       setSaLoadingAction(true);
       setSaMessage(null);
-      const res = await fetch('/api/superadmin/create-admin', {
+      const res = await fetch(`${API_BASE}/superadmin/create-admin`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -204,7 +206,7 @@ export default function App() {
     try {
       setSaLoadingAction(true);
       setSaMessage(null);
-      const res = await fetch(`/api/superadmin/upgrade/${saUpgradeUserId}`, {
+      const res = await fetch(`${API_BASE}/superadmin/upgrade/${saUpgradeUserId}`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -233,7 +235,7 @@ export default function App() {
     try {
       setSaLoadingAction(true);
       setSaMessage(null);
-      const res = await fetch(`/api/superadmin/downgrade/${saDowngradeAdminId}`, {
+      const res = await fetch(`${API_BASE}/superadmin/downgrade/${saDowngradeAdminId}`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -261,7 +263,7 @@ export default function App() {
     try {
       setSaLoadingAction(true);
       setSaMessage(null);
-      const res = await fetch(`/api/superadmin/delete/${id}`, {
+      const res = await fetch(`${API_BASE}/superadmin/delete/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -293,7 +295,7 @@ export default function App() {
     try {
       setSaLoadingAction(true);
       setSaMessage(null);
-      const res = await fetch(`/api/superadmin/update/${saUpdateAdminId}`, {
+      const res = await fetch(`${API_BASE}/superadmin/update/${saUpdateAdminId}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -324,10 +326,10 @@ export default function App() {
     const fetchData = async () => {
       try {
         const [resInt, resHack, resSch, resAct] = await Promise.all([
-          fetch('/api/internships'),
-          fetch('/api/hackathons'),
-          fetch('/api/scholarships'),
-          fetch('/api/activities')
+          fetch(`${API_BASE}/internships`),
+          fetch(`${API_BASE}/hackathons`),
+          fetch(`${API_BASE}/scholarships`),
+          fetch(`${API_BASE}/activities`)
         ]);
         
         const dataInt = await resInt.json();
@@ -560,7 +562,7 @@ export default function App() {
         setDetailsLoading(true);
         setDetailsError(null);
         try {
-          const res = await fetch(`/api/${detailsStream}/${detailsId}`);
+          const res = await fetch(`${API_BASE}/${detailsStream}/${detailsId}`);
           const json = await res.json();
           if (json.success && json.data) {
             let normalizedItem = { ...json.data, id: json.data._id || json.data.id };
@@ -774,7 +776,7 @@ export default function App() {
     setStudentError('');
     setStudentLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -815,7 +817,7 @@ export default function App() {
     setStudentRegSuccess('');
     setStudentRegLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -868,7 +870,7 @@ export default function App() {
     setAdminError('');
     setAdminLoading(true);
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(`${API_BASE}/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -901,7 +903,7 @@ export default function App() {
     try {
       // NOTE: role is NOT sent — backend always assigns 'user' for public registration.
       // Admin role must be assigned manually in the database by a super-admin.
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch(`${API_BASE}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -1086,7 +1088,7 @@ export default function App() {
     
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/${pipeline}/${id}`, {
+      const response = await fetch(`${API_BASE}/${pipeline}/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1125,7 +1127,7 @@ export default function App() {
 
     const token = localStorage.getItem('adminToken');
     const isEditMode = !!formId;
-    const url = isEditMode ? `/api/${targetPipeline}/${formId}` : `/api/${targetPipeline}`;
+    const url = isEditMode ? `${API_BASE}/${targetPipeline}/${formId}` : `${API_BASE}/${targetPipeline}`;
     const method = isEditMode ? 'PUT' : 'POST';
 
     // Construct pipeline specific payload
@@ -1335,7 +1337,7 @@ export default function App() {
     const link = item.affiliateLink || item.applyLink || item.link || item.url || item.registrationLink || item.applicationUrl || item.website;
     if (link) {
       toggleRegisterItem(item.id, rewardValue, xpReward);
-      window.open(`/api/opportunities/redirect/${stream}/${item.id}`, '_blank');
+      window.open(`${API_BASE}/opportunities/redirect/${stream}/${item.id}`, '_blank');
     } else {
       navigateTo(`/${stream}/${item.id}`);
     }
@@ -1382,7 +1384,7 @@ export default function App() {
     setContactSubmitLoading(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1417,7 +1419,7 @@ export default function App() {
     const token = localStorage.getItem('adminToken');
     if (!token) return;
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(`${API_BASE}/contact`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1435,7 +1437,7 @@ export default function App() {
     const token = localStorage.getItem('adminToken');
     if (!token) return;
     try {
-      const response = await fetch(`/api/contact/${id}`, {
+      const response = await fetch(`${API_BASE}/contact/${id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1458,7 +1460,7 @@ export default function App() {
     const token = localStorage.getItem('adminToken');
     if (!token) return;
     try {
-      const response = await fetch(`/api/contact/${id}`, {
+      const response = await fetch(`${API_BASE}/contact/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

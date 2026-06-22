@@ -66,6 +66,7 @@ const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:4321',
     'http://localhost:5173',
+    'https://campusloot-1.onrender.com',
     ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 app.use(cors({
