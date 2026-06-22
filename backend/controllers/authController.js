@@ -51,7 +51,6 @@ const registerUser = async (req, res) => {
         });
 
         if (user) {
-            const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
             res.status(201).json({
                 success: true,
                 _id: user._id,
@@ -59,7 +58,7 @@ const registerUser = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 token: generateToken(user),
-                isSuperAdmin: user.email === SUPER_ADMIN_EMAIL
+                isSuperAdmin: user.role === 'superadmin'
             });
         }
     } catch (error) {
@@ -91,8 +90,6 @@ const loginUser = async (req, res, next) => { // 'next' parameter add kiya
             throw new Error('Invalid email or password');
         }
         
-        const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
-
         res.status(200).json({
             success: true,
             _id: user._id,
@@ -101,7 +98,7 @@ const loginUser = async (req, res, next) => { // 'next' parameter add kiya
             role: user.role,
             college: user.college,
             token: generateToken(user),
-            isSuperAdmin: user.email === SUPER_ADMIN_EMAIL
+            isSuperAdmin: user.role === 'superadmin'
         });
     } catch (error) {
         next(error); // Manual res.json ki jagah error ko central middleware pe bhej diya
