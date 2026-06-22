@@ -13,7 +13,7 @@
 // Base URL
 // ---------------------------------------------------------------------------
 const BASE_URL: string =
-  (import.meta as any).env?.VITE_API_BASE_URL ?? '/api';
+  (import.meta as any).env?.VITE_API_URL ?? (import.meta as any).env?.VITE_API_BASE_URL ?? '/api';
 
 // ---------------------------------------------------------------------------
 // Generic fetch wrapper
