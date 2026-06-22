@@ -2,6 +2,7 @@ services:
   # Express Backend Web Service
   - type: web
     name: campusloot-backend
+    plan: free
     env: node
     buildCommand: npm install
     startCommand: npm start
@@ -21,6 +22,7 @@ services:
   # React Frontend Static Site
   - type: web
     name: campusloot-frontend
+    plan: free
     env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
