@@ -16,40 +16,42 @@ const setSuperAdmin = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB.');
 
-        const email = process.env.SUPER_ADMIN_EMAIL || 'knowledgespace457@gmail.com';
+        const superAdmins = ['knowledgespace457@gmail.com', 'yogeshkumarstudies@gmail.com'];
 
-        // 1. Demote old superadmins whose email is not the current SUPER_ADMIN_EMAIL
+        // 1. Demote any other superadmins who are not in the list
         const demoted = await User.updateMany(
-            { email: { $ne: email }, role: 'superadmin' },
+            { email: { $nin: superAdmins }, role: 'superadmin' },
             { role: 'user' }
         );
         if (demoted.modifiedCount > 0) {
             console.log(`Demoted ${demoted.modifiedCount} old superadmin(s).`);
         }
 
-        // 2. Find or create the new superadmin
-        let user = await User.findOne({ email });
+        // 2. Promote or create both superadmins
+        for (const email of superAdmins) {
+            let user = await User.findOne({ email });
 
-        if (!user) {
-            console.log(`User with email ${email} not found. Creating a new superadmin user...`);
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash('campusloot_admin_pwd_2026', salt);
+            if (!user) {
+                console.log(`User with email ${email} not found. Creating a new superadmin user...`);
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash('campusloot_admin_pwd_2026', salt);
 
-            user = await User.create({
-                name: 'Super Admin',
-                email: email,
-                password: hashedPassword,
-                role: 'superadmin',
-                college: 'Elite Institute',
-                year: 4,
-                branch: 'Computer Science'
-            });
-            console.log('Created user successfully:', user);
-        } else {
-            console.log('User found:', user);
-            user.role = 'superadmin';
-            await user.save();
-            console.log('Updated user role to superadmin.');
+                user = await User.create({
+                    name: email === 'knowledgespace457@gmail.com' ? 'Super Admin Sonu' : 'Super Admin Yogesh',
+                    email: email,
+                    password: hashedPassword,
+                    role: 'superadmin',
+                    college: 'Elite Institute',
+                    year: 4,
+                    branch: 'Computer Science'
+                });
+                console.log('Created user successfully:', user);
+            } else {
+                console.log('User found:', user);
+                user.role = 'superadmin';
+                await user.save();
+                console.log(`Updated ${email} role to superadmin.`);
+            }
         }
 
         await mongoose.disconnect();
