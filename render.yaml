@@ -27,9 +27,4 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          name: campusloot-backend
-          type: web
-          property: url
-          # Render automatically appends the backend URL here.
-          # Note: Vite injects environment variables during build time.
+        sync: false # Set manually in Render Dashboard (e.g., https://your-backend.onrender.com/api)
