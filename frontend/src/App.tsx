@@ -679,6 +679,7 @@ export default function App() {
   const [adminLoading, setAdminLoading] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminName, setAdminName] = useState('');
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   // Admin Register State
   const [registerName, setRegisterName] = useState('');
@@ -731,12 +732,16 @@ export default function App() {
 
     let isAdmin = false;
     let nameOfAdmin = '';
+    let isSuper = false;
 
     if (adminToken) {
       const decoded = decodeJWT(adminToken);
       if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin)) {
         isAdmin = true;
         nameOfAdmin = decoded.name || 'Yogesh Kumar';
+        if (decoded.role === 'superadmin') {
+          isSuper = true;
+        }
       }
     }
 
@@ -751,6 +756,9 @@ export default function App() {
           if (!localStorage.getItem('adminToken')) {
             localStorage.setItem('adminToken', userToken);
           }
+          if (decoded.role === 'superadmin') {
+            isSuper = true;
+          }
         }
       } else {
         setIsStudentLoggedIn(false);
@@ -763,6 +771,7 @@ export default function App() {
 
     setIsAdminLoggedIn(isAdmin);
     setAdminName(nameOfAdmin);
+    setIsSuperAdmin(isSuper);
   }, [currentPath]);
 
   useEffect(() => {
@@ -795,6 +804,9 @@ export default function App() {
           localStorage.setItem('adminToken', data.token);
           setIsAdminLoggedIn(true);
           setAdminName(data.name || 'Yogesh Kumar');
+          if (decoded.role === 'superadmin') {
+            setIsSuperAdmin(true);
+          }
         }
 
         setStudentEmail('');
@@ -860,6 +872,7 @@ export default function App() {
     localStorage.removeItem('adminToken');
     setIsStudentLoggedIn(false);
     setIsAdminLoggedIn(false);
+    setIsSuperAdmin(false);
     setStudentName('');
     setAdminName('');
     navigateTo('/');
@@ -883,6 +896,9 @@ export default function App() {
         const decoded = decodeJWT(data.token);
         setIsAdminLoggedIn(true);
         setAdminName(decoded?.name || 'Yogesh Kumar');
+        if (decoded && decoded.role === 'superadmin') {
+          setIsSuperAdmin(true);
+        }
         navigateTo('/admin/dashboard');
       } else {
         setAdminError(data.message || 'Invalid credentials');
@@ -947,6 +963,7 @@ export default function App() {
     localStorage.removeItem('userToken');
     setIsAdminLoggedIn(false);
     setIsStudentLoggedIn(false);
+    setIsSuperAdmin(false);
     setAdminName('');
     setStudentName('');
     navigateTo('/');
@@ -2623,6 +2640,15 @@ export default function App() {
             <span className="hidden md:inline text-xs text-[#888888] font-sans">
               Console ID: <strong className="text-white">{adminName}</strong>
             </span>
+            {isSuperAdmin && (
+              <button 
+                onClick={() => navigateTo('/superadmin')}
+                style={{ border: '1px solid #FF4B4B', background: 'rgba(255, 75, 75, 0.1)' }}
+                className="text-[#FF4B4B] hover:bg-[#FF4B4B] hover:text-[#0B0B0B] px-4 py-1.5 rounded-full text-xs transition-all cursor-pointer active:opacity-90 font-medium font-sans"
+              >
+                Super Admin Panel
+              </button>
+            )}
             <button 
               onClick={handleDisconnect}
               className="bg-transparent border border-[#2A2A2A] hover:border-rose-500 hover:text-rose-400 px-4 py-1.5 rounded-full text-xs transition-colors cursor-pointer active:opacity-90 font-medium"
@@ -2642,8 +2668,8 @@ export default function App() {
                   Central Command Console
                 </h2>
                 <p className="font-sans text-xs text-[#888888] mt-1 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-[#F5A623]" />
-                  Standard Administrator Access Mode
+                  <Lock className={`w-3.5 h-3.5 ${isSuperAdmin ? 'text-[#FF4B4B]' : 'text-[#F5A623]'}`} />
+                  {isSuperAdmin ? 'Root Super-Administrator Access Mode' : 'Standard Administrator Access Mode'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -3341,12 +3367,21 @@ export default function App() {
               <div className="text-left">
                 <p className="text-xs font-bold text-white leading-tight font-sans">{adminName}</p>
                 <span
-                  style={{ color: '#F5A623', fontSize: '11px', letterSpacing: '0.08em', fontFamily: "'Space Grotesk', sans-serif" }}
+                  style={{ color: isSuperAdmin ? '#FF4B4B' : '#F5A623', fontSize: '11px', letterSpacing: '0.08em', fontFamily: "'Space Grotesk', sans-serif" }}
                   className="font-bold uppercase block mt-0.5 leading-none"
                 >
-                  ADMIN
+                  {isSuperAdmin ? 'SUPER ADMIN' : 'ADMIN'}
                 </span>
               </div>
+              {isSuperAdmin && (
+                <button
+                  onClick={() => navigateTo('/superadmin')}
+                  style={{ border: '1px solid #FF4B4B', background: 'rgba(255, 75, 75, 0.1)' }}
+                  className="text-[#FF4B4B] px-3.5 py-1.5 rounded-[8px] text-xs font-semibold hover:bg-[#FF4B4B] hover:text-[#0B0B0B] transition-all cursor-pointer"
+                >
+                  Super Admin Panel
+                </button>
+              )}
               <button
                 onClick={() => navigateTo('/admin/dashboard')}
                 style={{ border: '1px solid #F5A623', background: 'rgba(245, 166, 35, 0.1)' }}
