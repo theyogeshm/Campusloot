@@ -16,7 +16,18 @@ const setSuperAdmin = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB.');
 
-        const email = 'yogeshkumarstudies@gmail.com';
+        const email = process.env.SUPER_ADMIN_EMAIL || 'knowledgespace457@gmail.com';
+
+        // 1. Demote old superadmins whose email is not the current SUPER_ADMIN_EMAIL
+        const demoted = await User.updateMany(
+            { email: { $ne: email }, role: 'superadmin' },
+            { role: 'user' }
+        );
+        if (demoted.modifiedCount > 0) {
+            console.log(`Demoted ${demoted.modifiedCount} old superadmin(s).`);
+        }
+
+        // 2. Find or create the new superadmin
         let user = await User.findOne({ email });
 
         if (!user) {
@@ -25,7 +36,7 @@ const setSuperAdmin = async () => {
             const hashedPassword = await bcrypt.hash('campusloot_admin_pwd_2026', salt);
 
             user = await User.create({
-                name: 'Yogesh Kumar',
+                name: 'Super Admin',
                 email: email,
                 password: hashedPassword,
                 role: 'superadmin',

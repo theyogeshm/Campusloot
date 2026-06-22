@@ -30,3 +30,7 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         sync: false # Set manually in Render Dashboard (e.g., https://your-backend.onrender.com/api)
+    routes:
+      - source: /*
+        destination: /index.html
+        type: rewrite
