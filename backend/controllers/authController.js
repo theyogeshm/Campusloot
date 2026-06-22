@@ -6,13 +6,15 @@ const dotenv = require('dotenv');
 
 // Token generate karne ka helper function - includes id, email, name, role, isAdmin
 const generateToken = (user) => {
+    const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
     return jwt.sign(
         { 
             id: user._id, 
             email: user.email, 
             name: user.name, 
             role: user.role, 
-            isAdmin: user.role === 'admin' || user.role === 'superadmin' 
+            isAdmin: user.role === 'admin' || user.role === 'superadmin',
+            isSuperAdmin: user.role === 'superadmin' || user.email === SUPER_ADMIN_EMAIL
         }, 
         process.env.JWT_SECRET, 
         { expiresIn: '7d' }

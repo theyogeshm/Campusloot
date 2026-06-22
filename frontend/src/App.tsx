@@ -461,7 +461,7 @@ export default function App() {
       let isSuperAdmin = false;
       if (token) {
         const decoded = decodeJWT(token);
-        if (decoded && decoded.role === 'superadmin') {
+        if (decoded && (decoded.role === 'superadmin' || decoded.isSuperAdmin === true)) {
           isSuperAdmin = true;
         }
       }
@@ -475,7 +475,7 @@ export default function App() {
       // Check specifically for a valid admin token (NOT user token)
       if (adminToken) {
         const decoded = decodeJWT(adminToken);
-        if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin)) {
+        if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin || decoded.isSuperAdmin === true)) {
           // Valid admin — redirect away from login/register pages to dashboard
           if (currentPath === '/admin/login' || currentPath === '/admin/register') {
             navigateTo('/admin/dashboard');
@@ -736,10 +736,10 @@ export default function App() {
 
     if (adminToken) {
       const decoded = decodeJWT(adminToken);
-      if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin)) {
+      if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin || decoded.isSuperAdmin === true)) {
         isAdmin = true;
         nameOfAdmin = decoded.name || 'Yogesh Kumar';
-        if (decoded.role === 'superadmin') {
+        if (decoded.role === 'superadmin' || decoded.isSuperAdmin === true) {
           isSuper = true;
         }
       }
@@ -750,13 +750,13 @@ export default function App() {
       if (decoded) {
         setIsStudentLoggedIn(true);
         setStudentName(decoded.name || 'Student');
-        if (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin) {
+        if (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin || decoded.isSuperAdmin === true) {
           isAdmin = true;
           nameOfAdmin = decoded.name || 'Yogesh Kumar';
           if (!localStorage.getItem('adminToken')) {
             localStorage.setItem('adminToken', userToken);
           }
-          if (decoded.role === 'superadmin') {
+          if (decoded.role === 'superadmin' || decoded.isSuperAdmin === true) {
             isSuper = true;
           }
         }
@@ -800,11 +800,11 @@ export default function App() {
         
         // Also check if logged-in student has admin role
         const decoded = decodeJWT(data.token);
-        if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin)) {
+        if (decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin || decoded.isSuperAdmin === true)) {
           localStorage.setItem('adminToken', data.token);
           setIsAdminLoggedIn(true);
           setAdminName(data.name || 'Yogesh Kumar');
-          if (decoded.role === 'superadmin') {
+          if (decoded.role === 'superadmin' || decoded.isSuperAdmin === true) {
             setIsSuperAdmin(true);
           }
         }
@@ -896,7 +896,7 @@ export default function App() {
         const decoded = decodeJWT(data.token);
         setIsAdminLoggedIn(true);
         setAdminName(decoded?.name || 'Yogesh Kumar');
-        if (decoded && decoded.role === 'superadmin') {
+        if (decoded && (decoded.role === 'superadmin' || decoded.isSuperAdmin === true)) {
           setIsSuperAdmin(true);
         }
         navigateTo('/admin/dashboard');
@@ -1715,7 +1715,7 @@ export default function App() {
     let isSuperAdmin = false;
     if (token) {
       const decoded = decodeJWT(token);
-      if (decoded && decoded.role === 'superadmin') {
+      if (decoded && (decoded.role === 'superadmin' || decoded.isSuperAdmin === true)) {
         isSuperAdmin = true;
       }
     }
@@ -2318,7 +2318,7 @@ export default function App() {
     const _adminTok = localStorage.getItem('adminToken');
     if (_userTok && !_adminTok) {
       const _decoded = decodeJWT(_userTok);
-      if (_decoded && _decoded.role !== 'admin' && !_decoded.isAdmin) {
+      if (_decoded && _decoded.role !== 'admin' && _decoded.role !== 'superadmin' && !_decoded.isAdmin && !_decoded.isSuperAdmin) {
         return (
           <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
             <div className="text-center">
@@ -2586,7 +2586,7 @@ export default function App() {
     const isValidAdmin = (() => {
       if (!token) return false;
       const decoded = decodeJWT(token);
-      return decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin);
+      return decoded && (decoded.role === 'admin' || decoded.role === 'superadmin' || decoded.isAdmin || decoded.isSuperAdmin === true);
     })();
 
     if (!isValidAdmin) {

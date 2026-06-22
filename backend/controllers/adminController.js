@@ -43,9 +43,17 @@ const adminLogin = async (req, res, next) => {
             });
         }
 
+        const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
         // Sign JWT token with admin role
         const token = jwt.sign(
-            { email: user.email, name: user.name, role: user.role, isAdmin: true, id: user._id },
+            { 
+                email: user.email, 
+                name: user.name, 
+                role: user.role, 
+                isAdmin: true, 
+                id: user._id,
+                isSuperAdmin: user.role === 'superadmin' || user.email === SUPER_ADMIN_EMAIL
+            },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
