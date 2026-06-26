@@ -707,6 +707,18 @@ export default function App() {
     }
   };
 
+  const isLoggedIn = () => {
+    const token = localStorage.getItem('userToken') || localStorage.getItem('adminToken');
+    if (!token) return false;
+    const decoded = decodeJWT(token);
+    if (!decoded) return false;
+    if (decoded.exp) {
+      const currentTime = Date.now() / 1000;
+      return decoded.exp > currentTime;
+    }
+    return true;
+  };
+
   // Student Login State
   const [studentEmail, setStudentEmail] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
@@ -812,7 +824,13 @@ export default function App() {
 
         setStudentEmail('');
         setStudentPassword('');
-        navigateTo('/'); // Redirects to "/" only
+        const redirectUrl = localStorage.getItem('applyRedirectUrl');
+        if (redirectUrl) {
+          localStorage.removeItem('applyRedirectUrl');
+          navigateTo(redirectUrl);
+        } else {
+          navigateTo('/');
+        }
       } else {
         setStudentError(data.message || 'Invalid credentials');
       }
@@ -4048,26 +4066,39 @@ export default function App() {
                         </div>
 
                         <div className="space-y-3 pt-2">
-                          <button 
-                            onClick={() => {
-                              if (detailsStream === 'internships') {
-                                handleApplyClick(item, 'internships');
-                              } else if (detailsStream === 'hackathons') {
-                                handleApplyClick(item, 'hackathons', item.isPartner ? 1000 : 200, item.isPartner ? 500 : 150);
-                              } else if (detailsStream === 'scholarships') {
-                                handleApplyClick(item, 'scholarships', item.id === 'sch-1' ? 800 : (item.id === 'sch-2' ? 1000 : 400), item.id === 'sch-1' ? 400 : (item.id === 'sch-2' ? 500 : 200));
-                              } else if (detailsStream === 'activities') {
-                                handleApplyClick(item, 'activities');
-                              }
-                            }}
-                            className={`w-full py-3 font-display text-sm font-bold tracking-wide rounded-xl transition-all duration-200 border text-center block cursor-pointer ${
-                              isApplied
-                                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                                : 'bg-[#F5A623] border-[#F5A623] text-[#0B0B0B] hover:bg-[#D4881A]'
-                            }`}
-                          >
-                            {isApplied ? 'Application Filed' : 'Register / Apply'}
-                          </button>
+                          <div className="relative group w-full">
+                            {!isLoggedIn() && !isApplied && (
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1E1E1E] border border-[#2A2A2A] text-white text-[11px] font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl font-sans">
+                                Login to apply for this opportunity
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#1E1E1E]"></div>
+                              </div>
+                            )}
+                            <button 
+                              onClick={() => {
+                                if (!isLoggedIn()) {
+                                  localStorage.setItem('applyRedirectUrl', currentPath);
+                                  navigateTo('/login');
+                                } else {
+                                  if (detailsStream === 'internships') {
+                                    handleApplyClick(item, 'internships');
+                                  } else if (detailsStream === 'hackathons') {
+                                    handleApplyClick(item, 'hackathons', item.isPartner ? 1000 : 200, item.isPartner ? 500 : 150);
+                                  } else if (detailsStream === 'scholarships') {
+                                    handleApplyClick(item, 'scholarships', item.id === 'sch-1' ? 800 : (item.id === 'sch-2' ? 1000 : 400), item.id === 'sch-1' ? 400 : (item.id === 'sch-2' ? 500 : 200));
+                                  } else if (detailsStream === 'activities') {
+                                    handleApplyClick(item, 'activities');
+                                  }
+                                }
+                              }}
+                              className={`w-full py-3 font-display text-sm font-bold tracking-wide rounded-xl transition-all duration-200 border text-center block cursor-pointer ${
+                                isApplied
+                                  ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                  : 'bg-[#F5A623] border-[#F5A623] text-[#0B0B0B] hover:bg-[#D4881A]'
+                              }`}
+                            >
+                              {isApplied ? 'Application Filed' : 'Register / Apply'}
+                            </button>
+                          </div>
                           
                           <button 
                             onClick={(e) => toggleSaveItem(item.id, e)}
@@ -4309,23 +4340,38 @@ export default function App() {
                             ))}
                           </div>
                           
-                          <button 
-                            onClick={() => handleApplyClick(item, 'internships')}
-                            className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
-                              isApplied
-                                ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
-                                : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
-                            }`}
-                          >
-                            {isApplied ? (
-                              <span className="flex items-center justify-center gap-1.5">
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                Application Pending
-                              </span>
-                            ) : (
-                              'Apply Now'
+                          <div className="relative group w-full">
+                            {!isLoggedIn() && !isApplied && (
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1E1E1E] border border-[#2A2A2A] text-white text-[11px] font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl font-sans">
+                                Login to apply for this opportunity
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#1E1E1E]"></div>
+                              </div>
                             )}
-                          </button>
+                            <button 
+                              onClick={() => {
+                                if (!isLoggedIn()) {
+                                  localStorage.setItem('applyRedirectUrl', currentPath);
+                                  navigateTo('/login');
+                                } else {
+                                  handleApplyClick(item, 'internships');
+                                }
+                              }}
+                              className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
+                                isApplied
+                                  ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
+                                  : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
+                              }`}
+                            >
+                              {isApplied ? (
+                                <span className="flex items-center justify-center gap-1.5">
+                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  Application Pending
+                                </span>
+                              ) : (
+                                'Apply Now'
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -4508,23 +4554,38 @@ export default function App() {
                           ))}
                         </div>
                         
-                        <button 
-                          onClick={() => handleApplyClick(item, 'hackathons', item.isPartner ? 1000 : 200, item.isPartner ? 500 : 150)}
-                          className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
-                            isApplied
-                              ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
-                              : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
-                          }`}
-                        >
-                          {isApplied ? (
-                            <span className="flex items-center justify-center gap-1.5">
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
-                              Application Pending
-                            </span>
-                          ) : (
-                            'Apply Opportunity'
+                        <div className="relative group w-full">
+                          {!isLoggedIn() && !isApplied && (
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1E1E1E] border border-[#2A2A2A] text-white text-[11px] font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl font-sans">
+                              Login to apply for this opportunity
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#1E1E1E]"></div>
+                            </div>
                           )}
-                        </button>
+                          <button 
+                            onClick={() => {
+                              if (!isLoggedIn()) {
+                                localStorage.setItem('applyRedirectUrl', currentPath);
+                                navigateTo('/login');
+                              } else {
+                                handleApplyClick(item, 'hackathons', item.isPartner ? 1000 : 200, item.isPartner ? 500 : 150);
+                              }
+                            }}
+                            className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
+                              isApplied
+                                ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
+                                : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
+                            }`}
+                          >
+                            {isApplied ? (
+                              <span className="flex items-center justify-center gap-1.5">
+                                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                Application Pending
+                              </span>
+                            ) : (
+                              'Apply Opportunity'
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -4719,23 +4780,38 @@ export default function App() {
                           ))}
                         </div>
                         
-                        <button 
-                          onClick={() => handleApplyClick(item, 'scholarships', item.id === 'sch-1' ? 800 : (item.id === 'sch-2' ? 1000 : 400), item.id === 'sch-1' ? 400 : (item.id === 'sch-2' ? 500 : 200))}
-                          className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
-                            isApplied
-                              ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
-                              : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
-                          }`}
-                        >
-                          {isApplied ? (
-                            <span className="flex items-center justify-center gap-1.5">
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
-                              Application Filed
-                            </span>
-                          ) : (
-                            'Apply Now'
+                        <div className="relative group w-full">
+                          {!isLoggedIn() && !isApplied && (
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1E1E1E] border border-[#2A2A2A] text-white text-[11px] font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl font-sans">
+                              Login to apply for this opportunity
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#1E1E1E]"></div>
+                            </div>
                           )}
-                        </button>
+                          <button 
+                            onClick={() => {
+                              if (!isLoggedIn()) {
+                                localStorage.setItem('applyRedirectUrl', currentPath);
+                                navigateTo('/login');
+                              } else {
+                                handleApplyClick(item, 'scholarships', item.id === 'sch-1' ? 800 : (item.id === 'sch-2' ? 1000 : 400), item.id === 'sch-1' ? 400 : (item.id === 'sch-2' ? 500 : 200));
+                              }
+                            }}
+                            className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
+                              isApplied
+                                ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
+                                : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
+                            }`}
+                          >
+                            {isApplied ? (
+                              <span className="flex items-center justify-center gap-1.5">
+                                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                Application Filed
+                              </span>
+                            ) : (
+                              'Apply Now'
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -4970,23 +5046,38 @@ export default function App() {
                             )}
                           </button>
                         ) : (
-                          <button 
-                            onClick={() => handleApplyClick(item, 'activities')}
-                            className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
-                              isApplied
-                                ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
-                                : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
-                            }`}
-                          >
-                            {isApplied ? (
-                              <span className="flex items-center justify-center gap-1.5">
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                {item.id === 'act-3' ? 'On Waiting List' : 'Registered'}
-                              </span>
-                            ) : (
-                              item.id === 'act-3' ? 'Join Waiting List' : 'Register Now'
+                          <div className="relative group w-full">
+                            {!isLoggedIn() && !isApplied && (
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1E1E1E] border border-[#2A2A2A] text-white text-[11px] font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl font-sans">
+                                Login to apply for this opportunity
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#1E1E1E]"></div>
+                              </div>
                             )}
-                          </button>
+                            <button 
+                              onClick={() => {
+                                if (!isLoggedIn()) {
+                                  localStorage.setItem('applyRedirectUrl', currentPath);
+                                  navigateTo('/login');
+                                } else {
+                                  handleApplyClick(item, 'activities');
+                                }
+                              }}
+                              className={`w-full py-2 font-display text-[14px] font-semibold tracking-[0.03em] rounded-[8px] transition-all duration-200 border ${
+                                isApplied
+                                  ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold'
+                                  : 'bg-transparent border-[#2A2A2A] text-white hover:bg-[#F5A623] hover:text-[#0B0B0B] hover:border-[#F5A623]'
+                              }`}
+                            >
+                              {isApplied ? (
+                                <span className="flex items-center justify-center gap-1.5">
+                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  {item.id === 'act-3' ? 'On Waiting List' : 'Registered'}
+                                </span>
+                              ) : (
+                                item.id === 'act-3' ? 'Join Waiting List' : 'Register Now'
+                              )}
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
